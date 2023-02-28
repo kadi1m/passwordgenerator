@@ -29,10 +29,15 @@ genrouter.post('/user/:id/:length?/:esc?', function (req, res) {
     let length = req.params.length
     let excludeSimCharacters = req.params.esc || "uknown"
     let exclude = req.params.esx || "unknown"
+    res.write(passwordgen(10, false, false, false, true))
+    res.write(moment().format() + " password generator used " + (req.params.id || "unkown"))
+    res.end()
+})
+
+genrouter.get('/genpass', function (req, res) {
     console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
     res.write(passwordgen(10, false, false, false, true))
     res.write(PROFILEID)
     res.end()
 })
-
 app.listen(process.env.PORT || 3000)
