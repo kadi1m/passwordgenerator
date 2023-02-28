@@ -35,4 +35,4 @@ genrouter.post('/user/:id/:length?/:esc?', function (req, res) {
     res.end()
 })
 
-app.listen(prcoss.env.PORT || 3000)
+app.listen(process.env.PORT || 3000)
