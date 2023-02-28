@@ -37,7 +37,6 @@ genrouter.post('/user/:id/:length?/:esc?', function (req, res) {
 genrouter.get('/genpass', function (req, res) {
     console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
     res.write(passwordgen(10, false, false, false, true))
-    res.write(PROFILEID)
     res.end()
 })
 app.listen(process.env.PORT || 3000)
