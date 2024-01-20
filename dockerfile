@@ -8,10 +8,6 @@ COPY package*.json ./
 
 USER node
 
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y nodejs \
-    npm               
-            # note this one
 RUN npm install
 
 COPY --chown=node:node . .
