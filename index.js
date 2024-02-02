@@ -34,7 +34,7 @@ genrouter.post('/user/:id/:length?/:esc?', function (req, res) {
     res.end()
 })
 
-genrouter.get('/genpass', function (req, res) {
+genrouter.get('/pass', function (req, res) {
     console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
     res.write(passwordgen(10, false, false, false, true))
     res.end()
