@@ -40,7 +40,7 @@ genrouter.get('/genpass', function (req, res) {
     res.end()
 })
 
-genrouter.get('/genpass12', function (req, res){
+genrouter.get('/genpass24', function (req, res){
     res.write(passwordgen(24, true, true, true, false ));
     res.end()
 })
