@@ -39,4 +39,9 @@ genrouter.get('/genpass', function (req, res) {
     res.write(passwordgen(10, false, false, false, true))
     res.end()
 })
+
+genrouter.get('/genpass12', function (req, res){
+    res.write(passwordgen(24, true, true, true, false ));
+    res.end()
+})
 app.listen(process.env.PORT || 3000)
