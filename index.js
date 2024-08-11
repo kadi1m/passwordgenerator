@@ -23,6 +23,11 @@ function passwordgen(plength, psymbols, plowercase, puppercase, pexcludeSimilarC
     return password
 }
 
+app.get('/', function(req, res)
+{
+    res.send(passwordgen(12, false, false, false, true))
+})
+
 
 genrouter.post('/user/:id/:length?/:esc?', function (req, res) {
     let PROFILEID = req.params.id
@@ -39,6 +44,8 @@ genrouter.get('/pass', function (req, res) {
     res.write(passwordgen(10, false, false, false, true))
     res.end()
 })
+
+console.log(passwordgen(10, false, false, false, true))
 
 genrouter.get('/genpass24', function (req, res){
     res.write(passwordgen(24, true, true, true, false ));
