@@ -25,7 +25,8 @@ function passwordgen(plength, psymbols, plowercase, puppercase, pexcludeSimilarC
 
 app.get('/', function(req, res)
 {
-    res.send(passwordgen(12, false, false, false, true))
+    res.redirect('genie/pass')
+    // res.send(passwordgen(12, false, false, false, true))
 })
 
 
