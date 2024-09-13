@@ -46,7 +46,7 @@ genrouter.get('/pass', function (req, res) {
     res.end()
 })
 
-console.log(passwordgen(10, false, false, false, true))
+// console.log(passwordgen(10, false, false, false, true))
 
 genrouter.get('/pass24', function (req, res){
     res.write(passwordgen(24, true, true, true, false ));
