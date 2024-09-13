@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const moment = require('moment')
+// const moment = require('moment')
 
 const options = { "caseSensitive": true, "strict": true }
 
@@ -30,15 +30,15 @@ app.get('/', function(req, res)
 })
 
 
-genrouter.post('/user/:id/:length?/:esc?', function (req, res) {
-    let PROFILEID = req.params.id
-    let length = req.params.length
-    let excludeSimCharacters = req.params.esc || "uknown"
-    let exclude = req.params.esx || "unknown"
-    res.write(passwordgen(10, false, false, false, true))
-    res.write(moment().format() + " password generator used " + (req.params.id || "unkown"))
-    res.end()
-})
+// genrouter.post('/user/:id/:length?/:esc?', function (req, res) {
+//     let PROFILEID = req.params.id
+//     let length = req.params.length
+//     let excludeSimCharacters = req.params.esc || "uknown"
+//     let exclude = req.params.esx || "unknown"
+//     res.write(passwordgen(10, false, false, false, true))
+//     res.write(moment().format() + " password generator used " + (req.params.id || "unkown"))
+//     res.end()
+// })
 
 genrouter.get('/pass', function (req, res) {
     console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
@@ -48,7 +48,7 @@ genrouter.get('/pass', function (req, res) {
 
 console.log(passwordgen(10, false, false, false, true))
 
-genrouter.get('/genpass24', function (req, res){
+genrouter.get('/pass24', function (req, res){
     res.write(passwordgen(24, true, true, true, false ));
     res.end()
 })
