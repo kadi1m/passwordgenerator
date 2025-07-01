@@ -28,11 +28,12 @@ jobs:
             docker image tag passwordgenerator-passgen:latest passwordgenerator-passgen:backup || true
 
             echo "🧹 Pulling latest changes..."
-            if [ -d .git ]; then
+            if [ ! -d .git ]; then
+              echo "🔄 Cloning fresh repo..."
+              git clone https://github.com/kadi1m/passwordgenerator.git .
+            else
               git fetch --all
               git reset --hard origin/main
-            else
-              echo "⚠️ Not a Git repo. Skipping pull."
             fi
 
             echo "📦 Building and launching new version with no cache..."
