@@ -29,13 +29,15 @@ jobs:
 
             if [ ! -d .git ]; then
               echo "📁 Not a Git repo. Cleaning and cloning..."
+              sudo chown -R $USER:$USER .
               find . -mindepth 1 -maxdepth 1 ! -name '.gitignore' -exec rm -rf {} +
-              git clone https://github.com/kadi1m/passwordgenerator.git .
+              git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
             else
               echo "🔁 Pulling latest changes..."
               git fetch --all
               git reset --hard origin/main
             fi
+
 
             echo "📦 Building and launching new version with no cache..."
             if docker compose build --no-cache && docker compose up -d; then
