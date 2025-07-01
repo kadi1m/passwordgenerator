@@ -22,7 +22,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no kadin@24.40.99.53 << 'EOF'
             set -e
-            cd /docker/passwordgenerator
+            cd /docker
+            cd /passwordgenerator
 
             echo "🔄 Backing up current Docker image..."
             docker image tag passgenerator-passgen:latest passgenerator-passgen:backup || true
