@@ -27,11 +27,12 @@ jobs:
             echo "🔄 Backing up current Docker image..."
             docker image tag passwordgenerator-passgen:latest passwordgenerator-passgen:backup || true
 
-            echo "🧹 Pulling latest changes..."
             if [ ! -d .git ]; then
-              echo "🔄 Cloning fresh repo..."
+              echo "📁 Not a Git repo. Cleaning and cloning..."
+              find . -mindepth 1 -maxdepth 1 ! -name '.gitignore' -exec rm -rf {} +
               git clone https://github.com/kadi1m/passwordgenerator.git .
             else
+              echo "🔁 Pulling latest changes..."
               git fetch --all
               git reset --hard origin/main
             fi
