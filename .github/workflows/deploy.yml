@@ -22,10 +22,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no kadin@24.40.99.53 << 'EOF'
             set -e
-            cd /var/www/your-app
+            cd /docker/passwordgenerator
 
             echo "🔄 Backing up current Docker image..."
-            docker image tag your-app:latest your-app:backup || true
+            docker image tag passgen:latest passgen:backup || true
 
             echo "🧹 Pulling latest changes..."
             git fetch --all
@@ -38,7 +38,7 @@ jobs:
               echo "❌ Deployment failed. Rolling back..."
 
               echo "🔁 Restoring previous Docker image..."
-              docker image tag your-app:backup your-app:latest
+              docker image tag passgen:backup passgen:latest
 
               echo "♻️ Restarting with backup image..."
               docker compose down
