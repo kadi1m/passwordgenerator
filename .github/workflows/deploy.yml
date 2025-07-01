@@ -22,15 +22,18 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no kadin@24.40.99.53 << 'EOF'
             set -e
-            cd docker
-            cd passwordgenerator
+            cd docker/passwordgenerator
 
             echo "🔄 Backing up current Docker image..."
-            docker image tag passgenerator-passgen:latest passgenerator-passgen:backup || true
+            docker image tag passwordgenerator-passgen:latest passwordgenerator-passgen:backup || true
 
             echo "🧹 Pulling latest changes..."
-            git fetch --all
-            git reset --hard origin/main
+            if [ -d .git ]; then
+              git fetch --all
+              git reset --hard origin/main
+            else
+              echo "⚠️ Not a Git repo. Skipping pull."
+            fi
 
             echo "📦 Building and launching new version..."
             if docker compose up -d --build; then
@@ -39,7 +42,7 @@ jobs:
               echo "❌ Deployment failed. Rolling back..."
 
               echo "🔁 Restoring previous Docker image..."
-              docker image tag passgenerator-passgen:backup passgenerator-passgen:latest
+              docker image tag passwordgenerator-passgen:backup passwordgenerator-passgen:latest
 
               echo "♻️ Restarting with backup image..."
               docker compose down
@@ -55,9 +58,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          curl -H "Content-Type: application/json" \
-          -X POST \
-          -d "{
+          curl -H "Content-Type: application/json"           -X POST           -d "{
             \"username\": \"Deploy Bot\",
             \"embeds\": [{
               \"title\": \"🚨 Production Deployment Failed\",
@@ -85,5 +86,4 @@ jobs:
               },
               \"timestamp\": \"$(date --utc +%Y-%m-%dT%H:%M:%SZ)\"
             }]
-          }" \
-          "$DISCORD_WEBHOOK_URL"
+          }"           "$DISCORD_WEBHOOK_URL"
