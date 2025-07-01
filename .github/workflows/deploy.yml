@@ -20,7 +20,7 @@ jobs:
       - name: Deploy to Production with Rollback
         id: deploy-step
         run: |
-          ssh -o StrictHostKeyChecking=no user@your-vps-ip << 'EOF'
+          ssh -o StrictHostKeyChecking=no kadin@24.40.99.53 << 'EOF'
             set -e
             cd /var/www/your-app
 
