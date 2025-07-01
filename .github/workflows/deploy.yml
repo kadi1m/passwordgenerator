@@ -31,7 +31,7 @@ jobs:
               echo "📁 Not a Git repo. Cleaning and cloning..."
               sudo chown -R $USER:$USER .
               find . -mindepth 1 -maxdepth 1 ! -name '.gitignore' -exec rm -rf {} +
-              git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git .
+              git clone https://github.com/kadi1m/passwordgenerator.git .
             else
               echo "🔁 Pulling latest changes..."
               git fetch --all
