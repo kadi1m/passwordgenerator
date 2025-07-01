@@ -25,7 +25,7 @@ jobs:
             cd /docker/passwordgenerator
 
             echo "🔄 Backing up current Docker image..."
-            docker image tag passgen:latest passgen:backup || true
+            docker image tag passgenerator-passgen:latest passgenerator-passgen:backup || true
 
             echo "🧹 Pulling latest changes..."
             git fetch --all
@@ -38,7 +38,7 @@ jobs:
               echo "❌ Deployment failed. Rolling back..."
 
               echo "🔁 Restoring previous Docker image..."
-              docker image tag passgen:backup passgen:latest
+              docker image tag passgenerator-passgen:backup passgenerator-passgen:latest
 
               echo "♻️ Restarting with backup image..."
               docker compose down
