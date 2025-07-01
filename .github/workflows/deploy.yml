@@ -1,0 +1,88 @@
+name: Deploy with Rollback and Discord Alert
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to Production with Rollback
+        id: deploy-step
+        run: |
+          ssh -o StrictHostKeyChecking=no user@your-vps-ip << 'EOF'
+            set -e
+            cd /var/www/your-app
+
+            echo "🔄 Backing up current Docker image..."
+            docker image tag your-app:latest your-app:backup || true
+
+            echo "🧹 Pulling latest changes..."
+            git fetch --all
+            git reset --hard origin/main
+
+            echo "📦 Building and launching new version..."
+            if docker compose up -d --build; then
+              echo "✅ Deployment successful!"
+            else
+              echo "❌ Deployment failed. Rolling back..."
+
+              echo "🔁 Restoring previous Docker image..."
+              docker image tag your-app:backup your-app:latest
+
+              echo "♻️ Restarting with backup image..."
+              docker compose down
+              docker compose up -d || echo "❌ Rollback also failed!"
+              exit 1
+            fi
+          EOF
+        continue-on-error: true
+
+      - name: Notify Discord on Failure
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{
+            \"username\": \"Deploy Bot\",
+            \"embeds\": [{
+              \"title\": \"🚨 Production Deployment Failed\",
+              \"description\": \"**Rollback has been triggered.**\\nCheck server status immediately.\",
+              \"color\": 16711680,
+              \"fields\": [
+                {
+                  \"name\": \"Branch\",
+                  \"value\": \"${{ github.ref_name }}\",
+                  \"inline\": true
+                },
+                {
+                  \"name\": \"Commit\",
+                  \"value\": \"[\\`${SHORT_SHA}\\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\",
+                  \"inline\": true
+                },
+                {
+                  \"name\": \"Developer\",
+                  \"value\": \"[${{ github.actor }}](https://github.com/${{ github.actor }})\",
+                  \"inline\": true
+                }
+              ],
+              \"footer\": {
+                \"text\": \"GitHub Actions CI/CD\"
+              },
+              \"timestamp\": \"$(date --utc +%Y-%m-%dT%H:%M:%SZ)\"
+            }]
+          }" \
+          "$DISCORD_WEBHOOK_URL"
