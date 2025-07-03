@@ -8,6 +8,11 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      GH_PAT: ${{ secrets.GH_PAT }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      USER: kadin
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -18,76 +23,55 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Production with Rollback
-        id: deploy-step
         run: |
-          ssh -o StrictHostKeyChecking=no kadin@24.40.99.53 << 'EOF'
+          ssh -o StrictHostKeyChecking=no $USER@24.40.99.53 "
             set -e
-            cd docker/passwordgenerator
-
-            echo "🔄 Backing up current Docker image..."
-            docker image tag passwordgenerator-passgen:latest passwordgenerator-passgen:backup || true
+            cd docker
+            cd passwordgenerator
 
             if [ ! -d .git ]; then
-              echo "📁 Not a Git repo. Cleaning and cloning..."
+              echo '📁 Not a Git repo. Cleaning and cloning...'
               sudo chown -R $USER:$USER .
               find . -mindepth 1 -maxdepth 1 ! -name '.gitignore' -exec rm -rf {} +
-              git clone https://github.com/kadi1m/passwordgenerator.git .
+              git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git . || git pull
             else
-              echo "🔁 Pulling latest changes..."
-              git fetch --all
-              git reset --hard origin/main
+              echo '🔄 Git repo exists. Pulling latest changes...'
+              git reset --hard
+              git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git
+              git pull
             fi
 
+            echo '🧹 Cleaning up existing containers...'
+            docker rm -f passwordgenerator-passgen || true
 
-            echo "📦 Building and launching new version with no cache..."
-            if docker compose build --no-cache && docker compose up -d; then
-              echo "✅ Deployment successful!"
-            else
-              echo "❌ Deployment failed. Rolling back..."
+            echo '🔧 Rebuilding Docker...'
+            docker compose down
+            docker compose build --no-cache
+            docker compose up -d
+          "
 
-              echo "🔁 Restoring previous Docker image..."
-              docker image tag passwordgenerator-passgen:backup passwordgenerator-passgen:latest
-
-              echo "♻️ Restarting with backup image..."
-              docker compose down
-              docker compose up -d || echo "❌ Rollback also failed!"
-              exit 1
-            fi
-          EOF
-        continue-on-error: true
-
-      - name: Notify Discord on Failure
-        if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: ✅ Notify Success to Discord
+        if: success()
         run: |
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          curl -H "Content-Type: application/json"           -X POST           -d "{
-            \"username\": \"Deploy Bot\",
-            \"embeds\": [{
-              \"title\": \"🚨 Production Deployment Failed\",
-              \"description\": \"**Rollback has been triggered.**\\nCheck server status immediately.\",
-              \"color\": 16711680,
-              \"fields\": [
-                {
-                  \"name\": \"Branch\",
-                  \"value\": \"${{ github.ref_name }}\",
-                  \"inline\": true
-                },
-                {
-                  \"name\": \"Commit\",
-                  \"value\": \"[\\`${SHORT_SHA}\\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\",
-                  \"inline\": true
-                },
-                {
-                  \"name\": \"Developer\",
-                  \"value\": \"[${{ github.actor }}](https://github.com/${{ github.actor }})\",
-                  \"inline\": true
-                }
-              ],
-              \"footer\": {
-                \"text\": \"GitHub Actions CI/CD\"
-              },
-              \"timestamp\": \"$(date --utc +%Y-%m-%dT%H:%M:%SZ)\"
+          curl -H "Content-Type: application/json" \
+          -X POST "$DISCORD_WEBHOOK" \
+          -d "$(jq -n --arg user "${{ github.actor }}" '{
+            "embeds": [{
+              "title": "✅ Deployment Successful",
+              "description": ("Deployed by **" + $user + "** to production."),
+              "color": 5763719
             }]
-          }"           "$DISCORD_WEBHOOK_URL"
+          }')"
+
+      - name: ❌ Notify Failure to Discord
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST "$DISCORD_WEBHOOK" \
+          -d "$(jq -n --arg user "${{ github.actor }}" '{
+            "embeds": [{
+              "title": "❌ Deployment Failed",
+              "description": ("Attempted by **" + $user + "**."),
+              "color": 15548997
+            }]
+          }')"
