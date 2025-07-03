@@ -36,9 +36,11 @@ jobs:
               git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git . || git pull
             else
               echo '🔄 Git repo exists. Pulling latest changes...'
-              git reset --hard
-              git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git
-              git pull
+              sudo chown -R $USER:$USER .
+              git config --global --add safe.directory /home/kadin/docker/wish-playerwatcher
+              git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git 
+              git fetch origin
+              git reset --hard origin/main
             fi
 
             echo '🧹 Cleaning up existing containers...'
