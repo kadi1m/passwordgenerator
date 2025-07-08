@@ -1,11 +1,13 @@
 const express = require('express')
 const app = express()
 const moment = require('moment')
+const cors = require('cors');
 
 const options = { "caseSensitive": true, "strict": true }
 
 const genrouter = express.Router([options])
 
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use('/genie', genrouter)
 
 var generator = require('generate-password');
