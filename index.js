@@ -28,9 +28,10 @@ app.use('/genie', genrouter)
 var generator = require('generate-password');
 
 
-function passwordgen(plength, psymbols, plowercase, puppercase, pexcludeSimilarCharacter) {
+function passwordgen(plength, pnumbers, psymbols, plowercase, puppercase, pexcludeSimilarCharacter) {
     var password = generator.generate({
         length: plength,
+        numbers: pnumbers,
         symbols: psymbols,
         lowercase: plowercase,
         uppercae: puppercase,
@@ -86,7 +87,7 @@ genrouter.get('/pass/:length', function (req, res) {
     console.log(length.length)
     console.log(length)
     // console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
-    res.write(passwordgen(length, true, true, true, true))
+    res.write(passwordgen(length, true, true, true, true, true))
     res.end()
 })
 app.listen(process.env.PORT || 3000)
