@@ -47,6 +47,14 @@ app.get('/', function (req, res) {
     // res.send(passwordgen(12, false, false, false, true))
 })
 
+app.get('/health', function (req, res) {
+    res.status(200).json({
+        status: 'healthy',
+        timestamp: moment().format(),
+        uptime: process.uptime()
+    })
+})
+
 
 // genrouter.get('/user/:id/length/:length/:symbols/:lowercase/:uppercase', function (req, res) {
 //     let PROFILEID = req.params.id || 0
