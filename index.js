@@ -34,8 +34,8 @@ function passwordgen(plength, pnumbers, psymbols, plowercase, puppercase, pexclu
         numbers: pnumbers,
         symbols: psymbols,
         lowercase: plowercase,
-        uppercae: puppercase,
-        pexcludeSimilarCharacter: pexcludeSimilarCharacter,
+        uppercase: puppercase,
+        excludeSimilarCharacters: pexcludeSimilarCharacter,
         exclude: '/"$`',
         strict: true
     });
@@ -95,7 +95,7 @@ genrouter.get('/pass/:length', function (req, res) {
     console.log(length.length)
     console.log(length)
     // console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
-    res.write(passwordgen(length, false, true, true, true, true))
+    res.write(passwordgen(length, false, false, true, true, true))
     res.end()
 })
 app.listen(process.env.PORT || 3000)
