@@ -38,9 +38,12 @@ jobs:
               git clone https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git .
             else
               echo '🔄 Git repo exists. Pulling latest changes...'
-              sudo chown -R $USER:$USER .
-              sudo rm -f /home/kadin/.gitconfig.lock
-              sudo chown $USER:$USER /home/kadin/.gitconfig || true
+              echo "User: $(whoami)"
+              sudo chown kadin:kadin /home/kadin
+              sudo chmod 755 /home/kadin
+              sudo chown -R kadin:kadin /home/kadin/docker/passwordgenerator
+              sudo rm -rf /home/kadin/.gitconfig.lock
+              sudo rm -rf /home/kadin/.gitconfig
               git config --global --add safe.directory /home/kadin/docker/passwordgenerator
               git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git 
               git fetch origin
