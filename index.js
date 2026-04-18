@@ -8,8 +8,8 @@ const options = { "caseSensitive": true, "strict": true }
 const genrouter = express.Router([options])
 
 const allowedOrigins = [
-  '192.168.1.112',
-  'http://192.168.1.112:3000'
+    '192.168.1.112',
+    'http://192.168.1.112:3000'
 ];
 
 // app.use(cors({
@@ -89,13 +89,13 @@ app.get('/health', function (req, res) {
 genrouter.get('/pass/:length', function (req, res) {
     let length = req.params.length
     // console.log(length)
-    if(length.length > 4) {
+    if (length.length > 4) {
         length = 512
     }
     console.log(length.length)
     console.log(length)
     // console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
-    res.write(passwordgen(length, true, true, true, true, true))
+    res.write(passwordgen(length, false, true, true, true, true))
     res.end()
 })
 app.listen(process.env.PORT || 3000)
