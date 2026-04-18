@@ -26,18 +26,22 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no $USER@24.40.99.53 "
             set -e
-            cd docker
-            cd passwordgenerator
+            mkdir -p ~/docker/passwordgenerator
+            cd ~/docker/passwordgenerator
 
             if [ ! -d .git ]; then
               echo '📁 Not a Git repo. Cleaning and cloning...'
               sudo chown -R $USER:$USER .
               find . -mindepth 1 -maxdepth 1 ! -name '.gitignore' -exec rm -rf {} +
-              git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git . || git pull
+              sudo rm -f /home/kadin/.gitconfig.lock
+              sudo chown $USER:$USER /home/kadin/.gitconfig || true
+              git clone https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git .
             else
               echo '🔄 Git repo exists. Pulling latest changes...'
               sudo chown -R $USER:$USER .
-              git config --global --add safe.directory /home/kadin/docker/wish-playerwatcher
+              sudo rm -f /home/kadin/.gitconfig.lock
+              sudo chown $USER:$USER /home/kadin/.gitconfig || true
+              git config --global --add safe.directory /home/kadin/docker/passwordgenerator
               git remote set-url origin https://${GH_PAT}@github.com/kadi1m/passwordgenerator.git 
               git fetch origin
               git reset --hard origin/main
