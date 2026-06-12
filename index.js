@@ -95,7 +95,7 @@ genrouter.get('/pass/:length', function (req, res) {
     console.log(length.length)
     console.log(length)
     // console.log(moment().format() + " password generator used " + (req.params.id || "unkown"))
-    res.write(passwordgen(length, false, false, true, true, true))
+    res.write(passwordgen(length, true, false, true, true, true))
     res.end()
 })
 app.listen(process.env.PORT || 3000)
