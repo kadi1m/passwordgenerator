@@ -5,7 +5,7 @@ const cors = require('cors'); // ✅ ADD THIS
 
 const options = { "caseSensitive": true, "strict": true }
 
-const genrouter = express.Router([options])
+const genrouter = express.Router(options)
 
 const allowedOrigins = [
     '192.168.1.112',
